@@ -20,7 +20,7 @@ module.exports = {
             await newUser.save();
 
             // Generate JWT token
-            const token = generateToken({ id: newUser._id });
+            const token = generateToken({ id: newUser._id, email });
 
             // Send the token in the response
             res.json({ token });

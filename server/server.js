@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const passport = require("passport");
 const connection = require("./config/db.config");
 const cors = require("cors");
+const authRouter = require("./routes/auth.routes");
 require("dotenv").config();
 
 
@@ -39,6 +40,9 @@ app.use(sessionMiddleware); // session creation, session ID generation, and sess
 // Passport middleware
 app.use(passport.initialize()); // sets up the framework for authentication
 app.use(passport.session()); // works with express-session to enable session-based authentication with Passport.js.
+
+// Routes
+app.use('/auth', authRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
