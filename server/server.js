@@ -1,6 +1,6 @@
 const express = require("express");
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const passport = require("passport");
 const connection = require("./config/db");
@@ -10,16 +10,15 @@ require("dotenv").config();
 
 const app = express();
 
-// Connect to MongoDB
-try {
-    await connection;
-    console.log("connected to monggoDB");
-} catch (error) {
-    console.log(error);
-}
-
 app.use(express.json());
 app.use(cors());
+
+
+// mongo store
+const mongoStore = MongoStore.create({
+    mongoUrl: process.env.DB_URL,
+    mongooseConnection: mongoose.connection,
+});
 
 // session middleware - provides a way to store and manage session data for each user session.
 let sessionMiddleware = session({
@@ -32,7 +31,7 @@ let sessionMiddleware = session({
     saveUninitialized: false, // can also result in empty sessions being stored in the session store so false
 
     // store - by default is server memory
-    store: new MongoStore({ mongooseConnection: mongoose.connection }), // session data is stored in MongoDB
+    store: mongoStore // session data is stored in MongoDB
 });
 
 app.use(sessionMiddleware); // session creation, session ID generation, and session data storage
@@ -48,7 +47,14 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const port = process.env.PORT || 8080;
+app.listen(port, async () => {
+    // Connect to MongoDB
+    try {
+        await connection;
+        console.log("connected to mongoDB");
+    } catch (error) {
+        console.log(error);
+    }
     console.log(`Server is running on port ${port}`);
 });
