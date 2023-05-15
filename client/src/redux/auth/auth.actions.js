@@ -10,7 +10,6 @@ export const signinAction = (cred, navigate) => async (dispatch) => {
 
     if (!cred.email || !cred.password) return alert("Please fill all fields");
     dispatch({ type: authTypes.AUTH_LOADING });
-    console.log(cred)
     try {
         const res = await axios.post(`/auth/login`, cred)
 

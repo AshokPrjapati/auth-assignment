@@ -52,6 +52,17 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal Server Error' });
 });
 
+// Serialize and deserialize user objects to/from the session
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    User.findById(id, (error, user) => {
+        done(error, user);
+    });
+});
+
 // Start the server
 const port = process.env.PORT || 8080;
 app.listen(port, async () => {
