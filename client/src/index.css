@@ -1,0 +1,20 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  line-height: 1.5;
+  font-weight: 400;
+
+  --primary-bg-color: #03a9f4;
+  --color-1: #0075BB;
+  --color-2: #D2F5FF;
+  --color-3: #6F3A00;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

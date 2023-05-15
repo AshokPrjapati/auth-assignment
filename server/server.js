@@ -6,6 +6,8 @@ const passport = require("passport");
 const connection = require("./config/db.config");
 const cors = require("cors");
 const authRouter = require("./routes/auth.routes");
+require('./config/localStrategy.config');
+require('./config/jwtStrategy.config');
 require("dotenv").config();
 
 

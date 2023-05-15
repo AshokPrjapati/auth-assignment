@@ -2,15 +2,15 @@ const passport = require('passport');// Middleware to protect routes
 
 
 exports.authenticate = (req, res, next) => {
-    passport.authenticate('jwt', { session: false }, (err, user) => {
+    passport.authenticate('local', { session: false }, (err, user) => {
         if (err) {
             // Handle authentication error
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(401).json({ message: 'Unauthorized' });
         }
 
         if (!user) {
             // No user found, authentication failed
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(401).json({ error: 'User does not exists' });
         }
 
         // User authenticated, store user object in request

@@ -18,11 +18,12 @@ passport.use(
             const user = await UserModel.findOne({ email: payload.email });
             // If user not found, return false
             if (!user) {
-                return done(null, false);
+                return done(null, false, { message: 'User not exists' });
             }
             // If user is found, return the user
             done(null, user);
         } catch (error) {
+            console.log(error)
             done(error, false);
         }
     })
