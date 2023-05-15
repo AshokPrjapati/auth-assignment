@@ -26,6 +26,25 @@ export const signinAction = (cred, navigate) => async (dispatch) => {
     }
 }
 
+export const gSigninAction = () => async (dispatch) => {
+
+
+    dispatch({ type: authTypes.GAUTH_LOADING });
+    try {
+        const res = await axios.get(`/auth/google`);
+
+        const data = await res.data;
+        console.log(data)
+
+        dispatch({ type: authTypes.GAUTH_SUCCESS });
+        alert("Login Success");
+    } catch (error) {
+        console.log('error:', error);
+        dispatch({ type: authTypes.GAUTH_ERROR });
+        alert(error?.response?.data?.error?.message || error?.response?.data?.error || "something went wrong");
+    }
+}
+
 
 /**
  * - SIGNUP FOR USERS

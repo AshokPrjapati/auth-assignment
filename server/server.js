@@ -6,6 +6,8 @@ const passport = require("passport");
 const connection = require("./config/db.config");
 const cors = require("cors");
 const authRouter = require("./routes/auth.routes");
+const { UserModel, GoogleUser } = require("./model/user.model");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 require('./config/localStrategy.config');
 require('./config/jwtStrategy.config');
 require("dotenv").config();
@@ -43,26 +45,46 @@ app.use(sessionMiddleware); // session creation, session ID generation, and sess
 app.use(passport.initialize()); // sets up the framework for authentication
 app.use(passport.session()); // works with express-session to enable session-based authentication with Passport.js.
 
+// Configure Google OAuth strategy
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:8080/auth/google/callback"
+},
+    async function (accessToken, refreshToken, profile, cb) {
+        console.log(profile)
+        try {
+            let user = await GoogleUser.findOne({ googleId: profile.id });
+
+            if (!user) {
+                user = new GoogleUser({ name: profile.displayName, googleId: profile.id, photo: profile._json.picture });
+                await user.save();
+            }
+
+            return cb(null, user);
+        } catch (error) {
+            return cb(error, null);
+        }
+    }
+));
+
 // Routes
 app.use('/auth', authRouter);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
-});
 
 // Serialize and deserialize user objects to/from the session
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
-passport.deserializeUser((id, done) => {
-    User.findById(id, (error, user) => {
-        done(error, user);
-    });
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await GoogleUser.findById(id).exec();
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
 });
-
 // Start the server
 const port = process.env.PORT || 8080;
 app.listen(port, async () => {

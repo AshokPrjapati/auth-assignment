@@ -1,6 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const UserModel = require("../model/user.model");
+const { UserModel } = require("../model/user.model");
 const { comparePassword } = require('../utils/bcryptUtils');
 require("dotenv").config();
 

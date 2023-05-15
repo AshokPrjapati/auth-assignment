@@ -3,7 +3,7 @@ import '../App.css'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
-import { signinAction, signupAction } from '../redux/auth/auth.actions';
+import { gSigninAction, signinAction, signupAction } from '../redux/auth/auth.actions';
 
 
 function Auth() {
@@ -13,6 +13,11 @@ function Auth() {
 
     const dispatch = useDispatch();
     const { loading } = useSelector(store => store.authManager);
+
+
+    const handelGAuth = () => {
+        dispatch(gSigninAction());
+    }
 
     const handleSubmit = useCallback((e) => {
         e.preventDefault();
@@ -60,6 +65,9 @@ function Auth() {
                     <span onClick={() => setSignin(!signin)}>{signin ? "Create an account!" : "Already have an account?"}</span>
                 </div>
             </form>
+            <div className='g_auth'>
+                <a href="http://localhost:8080/auth/google">Login with google</a>
+            </div>
         </div>
     )
 }

@@ -68,6 +68,24 @@
     border-radius: 5px;
 }
 
+.g_auth {
+    width: max-content;
+    margin: auto;
+    padding: 1rem;
+}
+
+.g_auth>a {
+    text-decoration: none;
+    text-align: center;
+    background-color: #333;
+    border: none;
+    outline: none;
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
 .box input[type="submit"]:disabled {
     cursor: not-allowed;
     background: #90c2d9;
