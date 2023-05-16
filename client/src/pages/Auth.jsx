@@ -3,7 +3,7 @@ import '../App.css'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
-import { gSigninAction, signinAction, signupAction } from '../redux/auth/auth.actions';
+import { signinAction, signupAction } from '../redux/auth/auth.actions';
 
 
 function Auth() {
@@ -16,7 +16,7 @@ function Auth() {
 
 
     const handelGAuth = () => {
-        dispatch(gSigninAction());
+        window.open(`${import.meta.env.VITE_API_URL}/auth/google`, "_self");
     }
 
     const handleSubmit = useCallback((e) => {
@@ -66,7 +66,7 @@ function Auth() {
                 </div>
             </form>
             <div className='g_auth'>
-                <a href="http://localhost:8080/auth/google">Login with google</a>
+                <button onClick={handelGAuth}>Login with google</button>
             </div>
         </div>
     )

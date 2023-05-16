@@ -3,13 +3,12 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const passport = require("passport");
-const connection = require("./config/db.config");
+const connection = require("./config/db");
 const cors = require("cors");
 const authRouter = require("./routes/auth.routes");
-const { UserModel, GoogleUser } = require("./model/user.model");
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-require('./config/localStrategy.config');
-require('./config/jwtStrategy.config');
+require('./config/localStrategy');
+require('./config/jwtStrategy');
+require("./config/googleStretegy")
 require("dotenv").config();
 
 
@@ -36,7 +35,7 @@ let sessionMiddleware = session({
     saveUninitialized: false, // can also result in empty sessions being stored in the session store so false
 
     // store - by default is server memory
-    store: mongoStore // session data is stored in MongoDB
+    store: mongoStore, // session data is stored in MongoDB
 });
 
 app.use(sessionMiddleware); // session creation, session ID generation, and session data storage
@@ -45,46 +44,13 @@ app.use(sessionMiddleware); // session creation, session ID generation, and sess
 app.use(passport.initialize()); // sets up the framework for authentication
 app.use(passport.session()); // works with express-session to enable session-based authentication with Passport.js.
 
-// Configure Google OAuth strategy
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/auth/google/callback"
-},
-    async function (accessToken, refreshToken, profile, cb) {
-        console.log(profile)
-        try {
-            let user = await GoogleUser.findOne({ googleId: profile.id });
 
-            if (!user) {
-                user = new GoogleUser({ name: profile.displayName, googleId: profile.id, photo: profile._json.picture });
-                await user.save();
-            }
-
-            return cb(null, user);
-        } catch (error) {
-            return cb(error, null);
-        }
-    }
-));
 
 // Routes
 app.use('/auth', authRouter);
 
 
-// Serialize and deserialize user objects to/from the session
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
 
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await GoogleUser.findById(id).exec();
-        done(null, user);
-    } catch (error) {
-        done(error, null);
-    }
-});
 // Start the server
 const port = process.env.PORT || 8080;
 app.listen(port, async () => {

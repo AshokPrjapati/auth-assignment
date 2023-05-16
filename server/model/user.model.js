@@ -14,32 +14,19 @@ const userSchema = Schema({
     },
     password: {
         type: String,
-        required: true,
+        default: "",
         select: false // Excludes the password field from query results
     },
-    googleId: String
+    photoURL: {
+        type: String,
+        default: ''
+    }
 }, {
     versionKey: false
 });
 
-// google user schema
-const googleUserSchema = Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    photo: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    googleId: String
-}, {
-    versionKey: false
-});
 
-// user model
 const UserModel = model("User", userSchema);
-const GoogleUser = model("GUser", googleUserSchema);
 
-module.exports = { UserModel, GoogleUser };
+
+module.exports = { UserModel };

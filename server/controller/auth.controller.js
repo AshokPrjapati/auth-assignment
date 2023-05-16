@@ -18,7 +18,6 @@ module.exports = {
             }
             try {
                 let hashedPassword = await hashPassword(password);
-                console.log(hashedPassword)
                 req.body.password = hashedPassword;
             } catch (error) {
                 console.log(error)
@@ -47,12 +46,12 @@ module.exports = {
         passport.authenticate('local', (err, user, info) => {
             if (err) {
                 // Handle authentication error
-                return res.status(401).json({ error: info });
+                return res.status(401).json(info);
             }
 
             if (!user) {
                 // Authentication failed
-                return res.status(401).json({ error: info });
+                return res.status(401).json(info);
             }
 
             req.login(user, (err) => {
@@ -62,7 +61,7 @@ module.exports = {
                 // Generate JWT token
                 const token = generateToken({ id: user._id, email });
                 // Send the token in the response
-                return res.json({ token })
+                return res.json({ token, message: "Registered succefully" })
             });
 
         })(req, res, next);
@@ -72,6 +71,7 @@ module.exports = {
 
     logout: (req, res) => {
         // Get the token from the request headers
+        req.logout(); // remove user from request 
         const token = req.headers.authorization.split(' ')[1];
 
         // Verify the token to check if it's valid and not expired
@@ -94,7 +94,7 @@ module.exports = {
                         return res.status(500).json({ message: 'Failed to blacklist token' });
                     }
 
-                    return res.json({ message: 'Logout successful' });
+                    return res.redirect(process.env.CLIENT_URL);
                 });
             });
         });
