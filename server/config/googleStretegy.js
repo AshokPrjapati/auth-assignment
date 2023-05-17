@@ -1,5 +1,6 @@
 const passport = require('passport');
 const { UserModel } = require('../model/user.model');
+const { hashPassword } = require('../utils/bcryptUtils');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // Configure Google OAuth strategy
@@ -10,16 +11,17 @@ passport.use(new GoogleStrategy({
 },
     async function (accessToken, refreshToken, profile, cb) {
         try {
-            let { name, picture, email } = profile._json;
+            let { picture, email } = profile._json;
+            let password = await hashPassword(process.env.GUSER_PASS)
             let user = await UserModel.findOne({ email });
             // if user not exists - create new one
             if (!user) {
                 const newUser = {
-                    name, photoURL: picture, email
+                    name: profile.displayName, photoURL: picture, email, password
                 }
                 user = new UserModel(newUser);
                 await user.save();
-                return done(null, newUser);
+                return cb(null, newUser);
             }
             // exists
             return cb(null, user);
@@ -28,21 +30,5 @@ passport.use(new GoogleStrategy({
         }
     }
 ));
-
-
-// Serialize and deserialize user objects to/from the session
-passport.serializeUser((user, done) => {
-    console.log(user)
-    done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await UserModel.findById(id).exec();
-        done(null, user);
-    } catch (error) {
-        done(error, null);
-    }
-});
 
 module.exports = passport;

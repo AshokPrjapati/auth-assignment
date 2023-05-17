@@ -3,9 +3,8 @@ import * as authTypes from './auth.actionTypes';
 const initialState = {
     loading: false,
     error: false,
-    isAuth: false,
+    isAuthenticated: JSON.parse(sessionStorage.getItem("isAuth")) || false,
     user: {},
-    token: sessionStorage.getItem("TOKEN") || ""
 }
 
 export const reducer = (state = initialState, { type, payload }) => {
@@ -24,8 +23,13 @@ export const reducer = (state = initialState, { type, payload }) => {
         }
 
         case authTypes.AUTH_LOGIN_SUCCESS: {
-            sessionStorage.setItem("TOKEN", payload);
-            return { loading: false, error: false, isAuth: true, token: payload }
+            sessionStorage.setItem("isAuth", true);
+            return { loading: false, error: false, isAuthenticated: true, token: payload }
+        }
+
+        case authTypes.GAUTH_SUCCESS: {
+            sessionStorage.setItem("isAuth", true);
+            return { loading: false, error: false, isAuthenticated: true }
         }
 
         case authTypes.AUTH_LOGOUT: {

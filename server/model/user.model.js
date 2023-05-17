@@ -14,6 +14,7 @@ const userSchema = Schema({
     },
     password: {
         type: String,
+        required: true,
         default: "",
         select: false // Excludes the password field from query results
     },

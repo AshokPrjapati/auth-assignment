@@ -71,20 +71,14 @@ module.exports = {
 
     logout: (req, res) => {
         // Get the token from the request headers
-        req.logout(); // remove user from request 
-        const token = req.headers.authorization.split(' ')[1];
+        const token = req?.headers?.authorization?.split(' ')[1];
 
         // Verify the token to check if it's valid and not expired
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-            if (err) {
-                // Token verification failed, return an error response
-                return res.status(401).json({ message: 'Invalid or expired token' });
-            }
-
-            // Token is valid, proceed with session destruction and blacklisting
-            req.session.destroy((err) => {
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
                 if (err) {
-                    return res.status(500).json({ message: 'Failed to destroy session' });
+                    // Token verification failed, return an error response
+                    return res.status(401).json({ message: 'Invalid or expired token' });
                 }
 
                 // Create a new entry in the blacklist collection with the token
@@ -94,9 +88,27 @@ module.exports = {
                         return res.status(500).json({ message: 'Failed to blacklist token' });
                     }
 
-                    return res.redirect(process.env.CLIENT_URL);
+                    // req.logout(); // remove user from request 
+
+                    return res.status(200).send({ message: "logout success", isAuthenticated: false });
                 });
             });
+        }
+
+        //  proceed with session destruction and blacklisting
+        req.logout((er) => {
+            if (er) {
+                return res.status(500).json({ message: 'failed to logout' });
+            }
+            req.session.destroy((err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Failed to destroy session' });
+                } else {
+                    res.status(200).send({ message: "logout success", isAuthenticated: false });
+                }
+            });
+
         });
+
     }
 }

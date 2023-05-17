@@ -6,6 +6,7 @@ const passport = require("passport");
 const connection = require("./config/db");
 const cors = require("cors");
 const authRouter = require("./routes/auth.routes");
+const { UserModel } = require("./model/user.model");
 require('./config/localStrategy');
 require('./config/jwtStrategy');
 require("./config/googleStretegy")
@@ -15,7 +16,7 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 
 // mongo store
@@ -48,6 +49,20 @@ app.use(passport.session()); // works with express-session to enable session-bas
 
 // Routes
 app.use('/auth', authRouter);
+
+// Serialize and deserialize user objects to/from the session
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await UserModel.findById(id).exec();
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
+});
 
 
 
